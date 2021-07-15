@@ -1,12 +1,19 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { validateRequest, BadRequestError, VerificationStatus } from '@vboxdev/common';
+import {
+  validateRequest,
+  BadRequestError,
+  VerificationStatus,
+} from '@vboxdev/common';
 import { User } from '../models/user';
-import {email} from './email/email';
-import {natsWrapper} from '../nats-wrapper'
-import {UserCreatedPublisher} from '../events/publisher/user-created-publisher'
+import { email } from './email/email';
+import { natsWrapper } from '../nats-wrapper';
+import { UserCreatedPublisher } from '../events/publisher/user-created-publisher';
 
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
 
 const router = express.Router();
 
@@ -25,26 +32,17 @@ router.post(
       .withMessage('Password must be between 4 and 20 chracters')
       .matches(/\d/)
       .withMessage('Password must contain a number'),
-    body('username')
-      .not()
-      .isEmpty()
-      .withMessage('Firstname is required'),
+    body('username').not().isEmpty().withMessage('Firstname is required'),
     body('telephone')
       .notEmpty()
       .matches(/^\d+$/)
       .withMessage('Invalid telephone number'),
-    
   ],
-  validateRequest, [email],
+  validateRequest,
+  [email],
 
   async (req: Request, res: Response) => {
-    const {
-      email,
-      password,
-      username,
-      telephone,
-      userType
-    } = req.body;
+    const { email, password, username, telephone, userType } = req.body;
 
     const existingUser = await User.findOne({ email });
     const expiration = new Date();
@@ -56,6 +54,21 @@ router.post(
       throw new BadRequestError('Email Already In Use');
     }
 
+    const verification_code = Math.floor(Math.random() * 899999 + 100000);
+
+    console.log(verification_code);
+
+    client.messages
+      .create({
+        body: `${verification_code} is your verification code for VBOX`,
+        from: '+15209993884',
+        to: '+'+telephone,
+      })
+      //@ts-ignore
+      .then((message) => console.log(message))
+      //@ts-ignore
+      .catch((error) => console.log(error));
+
     const user = User.build({
       email,
       password,
@@ -63,8 +76,10 @@ router.post(
       telephone,
       userType,
       verification: VerificationStatus.Unverified,
+      verification_code,
       expiresAt: expiration,
     });
+    
 
     await user.save();
 
@@ -77,11 +92,10 @@ router.post(
       userType: user.userType!,
       telephone: parseInt(user.telephone),
       expiresAt: user.expiresAt,
-      verification: user.verification
-    })
-
-
-
+      status: user.status!,
+      version: user.version,
+      verification: user.verification,
+    });
 
     // Generate JWT
 
@@ -92,7 +106,7 @@ router.post(
         username: user.username,
         telephone: user.telephone,
         userType: user.userType,
-        status: user.status
+        status: user.status,
       },
       process.env.JWT_KEY!
     );
@@ -100,7 +114,7 @@ router.post(
     // store it on session object
 
     req.session = {
-      jwt: userJwt
+      jwt: userJwt,
     };
 
     res.status(201).send(user);

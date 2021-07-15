@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: movies-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: movies
   template:
     metadata:
       labels:
-        app: auth
+        app: movies
     spec:
       containers:
-        - name: auth
-          image: bigfash45/auth
+        - name: movies
+          image: bigfash45/movies
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
@@ -25,7 +25,7 @@ spec:
             - name: NATS_CLUSTER_ID
               value: VBOX
             - name: MONGO_URI
-              value: 'mongodb://auth-mongo-srv:27017/auth'
+              value: 'mongodb://movies-mongo-srv:27017/movies'
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
@@ -50,12 +50,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: movies-srv
 spec:
   selector:
-    app: auth
+    app: movies
   ports:
-    - name: auth
+    - name: movies
       protocol: TCP
       port: 3000
       targetPort: 3000

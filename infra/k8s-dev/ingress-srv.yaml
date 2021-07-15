@@ -15,9 +15,12 @@ spec:
             backend:
               service:
                 name: auth-srv
-                port: 
+                port:
                   number: 3000
-             
-         
-         
-
+          - path: /api/movies/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: movies-srv
+                port:
+                  number: 3000

@@ -1,8 +1,9 @@
 import express, { Response, Request } from 'express';
 import { User } from '../models/user';
 import { body } from 'express-validator';
+import { natsWrapper } from '../nats-wrapper';
 import { NotFoundError, requireAuth, currentUser, NotAuthorizedError } from '@vboxdev/common';
-
+import { UserUpdatedPublisher } from '../events/publisher/user-updated-publisher ';
 const router = express.Router();
 
 router.put(
@@ -57,6 +58,20 @@ router.put(
     }
 
     await user.save();
+
+
+       new UserUpdatedPublisher(natsWrapper.client).publish({
+         id: user.id,
+         email: user.email,
+         username: user.username,
+         userType: user.userType!,
+         telephone: parseInt(user.telephone),
+         expiresAt: user.expiresAt,
+         status: user.status!,
+         version: user.version,
+         verification: user.verification,
+       });
+
 
     res.send(user);
   }
