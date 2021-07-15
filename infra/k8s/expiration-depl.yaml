@@ -26,4 +26,3 @@ spec:
               value: VBOX
             - name: REDIS_HOST
               value: expiration-redis-srv
-              
