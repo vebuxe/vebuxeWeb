@@ -6,10 +6,10 @@ deploy:
       - ./infra/k8s/*
       - ./infra/k8s-dev/*
 build:
-  # local:
-  #   push: false
-  googleCloudBuild:
-    projectId: v-box-318815
+  local:
+    push: false
+  # googleCloudBuild:
+  #   projectId: v-box-318815
   artifacts:
     - image: bigfash45/auth
       context: auth
@@ -35,3 +35,4 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+            
