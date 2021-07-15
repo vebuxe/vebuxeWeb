@@ -7,7 +7,7 @@ import { natsWrapper } from './nats-wrapper';
 const start = async () => {
 
 
-  console.log('Starting...................')
+  console.log('Starting............//.......')
 
 
   if (!process.env.JWT_KEY) {
