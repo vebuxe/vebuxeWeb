@@ -6,7 +6,7 @@ interface CategoryAttrs {
 
 }
 
-interface CategoryDoc extends mongoose.Document {
+export interface CategoryDoc extends mongoose.Document {
   title: string;
   description: string;
 

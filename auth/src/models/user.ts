@@ -74,7 +74,7 @@ const userSchema = new mongoose.Schema(
     },
     verification_code: {
       type: Number,
-      required: true,
+      default: 0,
     },
     expiresAt: {
       type: mongoose.Schema.Types.Date,

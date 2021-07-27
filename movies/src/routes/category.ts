@@ -1,7 +1,9 @@
 import express, { Request, Response } from 'express';
-import { currentUser,  requireAuth,
+import {
+  requireAuth,
   validateRequest,
-  requireAuthAdmin, } from '@vboxdev/common';
+  requireAuthAdmin,
+} from '@vboxdev/common';
 import { body } from 'express-validator';
 import { Category } from '../models/category';
 
@@ -17,8 +19,6 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-
-    
     const { title, description } = req.body;
 
     const category = Category.build({
@@ -27,8 +27,6 @@ router.post(
     });
 
     await category.save();
-
-  
 
     res.status(201).send(category);
   }

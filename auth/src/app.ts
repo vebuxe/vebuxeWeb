@@ -11,6 +11,10 @@ import { PasswordResetEmailRouter } from './routes/password-reset-email';
 import { PasswordResetRouter } from './routes/password-reset';
 import { UserRouter } from './routes/user';
 import { UserUpdateRouter } from './routes/update';
+import { UserOnBoardingMessageRouter } from './routes/onboardingMessage';
+import { GetUserOnBoardingMessageRouter } from './routes/getOnboardingMessage';
+import { OnboardingUpdateRouter } from './routes/updateOnboardingMessage';
+import { RequestVerificationCodeRouter } from './routes/RequestVerificationCode';
 
 
 
@@ -34,7 +38,10 @@ app.use(PasswordResetEmailRouter);
 app.use(PasswordResetRouter);
 app.use(UserRouter);
 app.use(UserUpdateRouter);
-
+app.use(UserOnBoardingMessageRouter);
+app.use(GetUserOnBoardingMessageRouter);
+app.use(OnboardingUpdateRouter);
+app.use(RequestVerificationCodeRouter);
 
 app.all('*', async (req, res, next) => {
   throw new NotFoundError();

@@ -1,18 +1,18 @@
 import express, { Request, Response } from 'express';
-import { NotFoundError } from '@vboxdev/common';
+import { NotFoundError, BadRequestError } from '@vboxdev/common';
+import { Movies } from '../models/movies';
 import { User } from '../models/users';
+import { Category } from '../models/category';
 
 const router = express.Router();
 
-router.get('/api/movies/', async(req: Request, res: Response) => {
- 
-  const user = await User.find({});
+router.post('/api/movies/upload', async (req: Request, res: Response) => {
+  console.log(req.files);
+  
 
-  if (!user) {
-    throw new NotFoundError();
-  }
+  res.json(req.files);
+  
 
-  res.send(user);
 });
 
 export { router as IndexrRouter };

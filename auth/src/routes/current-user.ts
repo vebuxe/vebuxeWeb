@@ -1,19 +1,17 @@
-import express, {Request, Response} from 'express';
-import {currentUser} from '@vboxdev/common';
+import express, { Request, Response } from 'express';
+import { currentUser } from '@vboxdev/common';
 
 const router = express.Router();
 
-router.get('/api/users/currentuser', currentUser, (req : Request, res : Response) => {
+router.get(
+  '/api/users/currentuser',
+  currentUser,
+  (req: Request, res: Response) => {
     res.send({
-        currentuser: req.currentUser || null
+      currentuser: req.currentUser || null,
     });
+  }
+  
+);
 
-    
-   
-});
-
-
-
-export {
-    router as currentUserRouter
-};
+export { router as currentUserRouter };

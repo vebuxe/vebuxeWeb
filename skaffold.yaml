@@ -6,12 +6,12 @@ deploy:
       - ./infra/k8s/*
       - ./infra/k8s-dev/*
 build:
-  local:
-    push: false
-  # googleCloudBuild:
-  #   projectId: v-box-318815
+  # local:
+  #   push: false
+  googleCloudBuild:
+    projectId: v-box-318815
   artifacts:
-    - image: dimeji45/auth
+    - image: us.gcr.io/v-box-318815/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -19,7 +19,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: dimeji45/expiration
+    - image: us.gcr.io/v-box-318815/expiration
       context: expiration
       docker:
         dockerfile: Dockerfile
@@ -27,7 +27,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: dimeji45/movies
+    - image: us.gcr.io/v-box-318815/movies
       context: movies
       docker:
         dockerfile: Dockerfile
@@ -35,4 +35,3 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-            

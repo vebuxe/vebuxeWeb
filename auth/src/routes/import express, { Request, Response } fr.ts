@@ -11,7 +11,6 @@ import { Movies } from '../models/movies';
 import { User } from '../models/users';
 import { Category } from '../models/category';
 import bodyParser from 'body-parser';
-
 const router = express.Router();
 
 router.post(
@@ -29,10 +28,9 @@ router.post(
     }
 
     let form = new formidable.IncomingForm();
-    // @ts-ignore
-    form.maxFileSize = 1000 * 1024 * 10024;
-    // @ts-ignore
-    form.keepExtensions = true;
+    // form.maxFileSize = 1000 * 1024 * 1024;
+
+    // form.keepExtensions = true;
     form.parse(req, async (err, fields, files) => {
       if (err) {
         return res.status(400).json({ error: 'File could not be uploaded' });
@@ -50,14 +48,14 @@ router.post(
 
       const cat = await Category.findById(category);
       if (!cat) {
-        return res.status(400).json({
-          error: 'Category ID provided is invalid or does not exist!!!',
-        });
+        throw new BadRequestError(
+          'Category ID provided is invalid or does not exist!!!'
+        );
       }
 
       let movies = new Movies(fields);
       if (files.file) {
-        console.log('FILES PHOTO', files.file);
+        // console.log('FILES PHOTO', files.file);
         // @ts-ignore
         movies.file.data = fs.readFileSync(files.file.path, 'utf8');
         // @ts-ignore

@@ -7,13 +7,11 @@ import {
   VerificationStatus,
 } from '@vboxdev/common';
 import { User } from '../models/user';
-import { email } from './email/email';
+
 import { natsWrapper } from '../nats-wrapper';
 import { UserCreatedPublisher } from '../events/publisher/user-created-publisher';
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require('twilio')(accountSid, authToken);
+
 
 const router = express.Router();
 
@@ -21,65 +19,60 @@ router.post(
   '/api/users/signup',
 
   [
-    body('email')
-      .normalizeEmail()
-      .trim()
-      .isEmail()
-      .withMessage('Email must be vaild'),
     body('password')
       .trim()
       .isLength({ min: 6, max: 20 })
       .withMessage('Password must be between 4 and 20 chracters')
       .matches(/\d/)
       .withMessage('Password must contain a number'),
-    body('username').not().isEmpty().withMessage('Firstname is required'),
+    body('rpassword')
+      .trim()
+      .isLength({ min: 6, max: 20 })
+      .withMessage('Password must be between 4 and 20 chracters')
+      .matches(/\d/)
+      .withMessage('Password must contain a number'),
+    body('fullname').not().isEmpty().withMessage('Fullname is required'),
     body('telephone')
       .notEmpty()
       .matches(/^\d+$/)
       .withMessage('Invalid telephone number'),
   ],
   validateRequest,
-  [email],
+
 
   async (req: Request, res: Response) => {
-    const { email, password, username, telephone, userType } = req.body;
+    const { email, password, fullname, telephone, userType, rpassword } =
+      req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      $or: [{ email }, { telephone }],
+    });
     const expiration = new Date();
     expiration.setSeconds(expiration.getSeconds() + 60 * 2);
 
     if (existingUser) {
       // console.log('Email in use');
       // return res.send({})
-      throw new BadRequestError('Email Already In Use');
+      throw new BadRequestError('Email or Telephone Already In Use');
     }
 
-    const verification_code = Math.floor(Math.random() * 899999 + 100000);
+    if (rpassword !== password) {
+          throw new BadRequestError('Password do not match');
+       }
 
-    console.log(verification_code);
-
-    client.messages
-      .create({
-        body: `${verification_code} is your verification code for VBOX`,
-        from: '+15209993884',
-        to: '+'+telephone,
-      })
-      //@ts-ignore
-      .then((message) => console.log(message))
-      //@ts-ignore
-      .catch((error) => console.log(error));
+ 
+ 
 
     const user = User.build({
       email,
       password,
-      username,
+      username: fullname,
       telephone,
       userType,
       verification: VerificationStatus.Unverified,
-      verification_code,
+      verification_code: 0,
       expiresAt: expiration,
     });
-    
 
     await user.save();
 
@@ -117,7 +110,13 @@ router.post(
       jwt: userJwt,
     };
 
-    res.status(201).send(user);
+    res.status(201).send({
+      success: true,
+      message: 'Registration was successful!',
+      code: 201,
+      verification: user.verification,
+      user,
+    });
   }
 );
 

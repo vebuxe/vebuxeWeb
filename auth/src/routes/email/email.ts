@@ -1,7 +1,15 @@
 // require on top
 import express, { Request, Response, NextFunction } from 'express';
 import { User } from '../../models/user';
-import {validateRequest, BadRequestError,VerificationStatus} from '@vboxdev/common';
+import { validateRequest, BadRequestError, VerificationStatus } from '@vboxdev/common';
+import { natsWrapper } from '../../nats-wrapper';
+import { UserUpdatedPublisher } from '../../events/publisher/user-updated-publisher ';
+
+
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
 
 
 const sgMail = require('@sendgrid/mail');
@@ -12,22 +20,54 @@ export const email = async (
   res: Response,
   next: NextFunction
 ) => {
-    const { email, username } = req.body;
+    const { telephone } = req.body;
     
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ telephone });
     
-     if (existingUser) {
-       console.log('Email in use');
-   
-         throw new BadRequestError('Email Already In Use');
-        
+     if (!existingUser) {
+         throw new BadRequestError('User with telephone number does not exist');
     }
+
+
+       const verification_code = Math.floor(Math.random() * 899999 + 100000);
+
+       console.log(verification_code);
+
+       client.messages
+         .create({
+           body: `${verification_code} is your verification code for VBOX`,
+           from: '+15209993884',
+           to: '+' + telephone,
+         })
+         //@ts-ignore
+         .then((message) => console.log(message))
+         //@ts-ignore
+         .catch((error) => console.log(error));
+
+       if (verification_code) {
+         existingUser.set({ verification_code });
+       }
+
+    await existingUser.save();
+    
+
+      new UserUpdatedPublisher(natsWrapper.client).publish({
+        id: existingUser.id,
+        email: existingUser.email,
+        username: existingUser.username,
+        userType: existingUser.userType!,
+        telephone: parseInt(existingUser.telephone),
+        expiresAt: existingUser.expiresAt,
+        status: existingUser.status!,
+        version: existingUser.version,
+        verification: existingUser.verification,
+      });
 
 
   const emailData = {
     from: 'afasina@nasdng.com',
-    to: `${email}`,
-    subject: `Dear ${username}`,
+    to: `${existingUser.email}`,
+    subject: `Dear ${existingUser.username}`,
     html: `
     <!DOCTYPE html>
     <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0 auto !important;padding: 0 !important;font-size: 14px;margin-bottom: 10px;line-height: 24px;color: #8094ae;font-weight: 400;height: 100% !important;width: 100% !important;font-family: 'Roboto', sans-serif !important;">
@@ -48,7 +88,7 @@ export const email = async (
                                     <tbody style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                         <tr style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                             <td style="text-align: center;padding-bottom: 25px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;mso-table-lspace: 0pt !important;mso-table-rspace: 0pt !important;">
-                                                <a href="#" style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;text-decoration: none;"><img style="height: 40px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;-ms-interpolation-mode: bicubic;" src="https://nasdng.com/wp-content/uploads/2020/10/logoRent.png" alt="logo"></a>
+                                                <a href="#" style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;text-decoration: none;"><img style="height: 40px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;-ms-interpolation-mode: bicubic;" src="" alt="logo"></a>
                                                 <p style="font-size: 14px;color: #6576ff;padding-top: 12px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Conceptual Base Modern Dashboard Theme</p>
                                             </td>
                                         </tr>
@@ -63,26 +103,21 @@ export const email = async (
                                         </tr>
                                         <tr style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                             <td style="padding: 0 30px 20px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;mso-table-lspace: 0pt !important;mso-table-rspace: 0pt !important;">
-                                                <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Hi ${username},</p>
+                                                <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Hi ${existingUser.username},</p>
                                                 <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Welcome!
                                                     <br style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                                     You are receiving this email because you have registered on our site.</p>
-                                                <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Click the link below to active your RentWise account.</p>
-                                                <p style="margin-bottom: 25px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">This link will expire in 15 minutes and can only be used once.</p>
-                                                <a href="http://www.rentwise.com.ng/verifications/account-created-verified" style="background-color: #6576ff;border-radius: 4px;color: #ffffff;display: inline-block;font-size: 13px;font-weight: 600;line-height: 44px;text-align: center;text-decoration: none;text-transform: uppercase;padding: 0 30px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;">Verify Email</a>
+                                                     <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
+                                                     Verification Code : ${existingUser.verification_code}
+                                                     </p>
+                                               
                                             </td>
                                         </tr>
-                                        <tr style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
-                                            <td style="padding: 0 30px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;mso-table-lspace: 0pt !important;mso-table-rspace: 0pt !important;">
-                                                <h4 style="font-size: 15px;color: #000000;font-weight: 600;margin: 0;text-transform: uppercase;margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;padding: 0;">or</h4>
-                                                <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">If the button above does not work, paste this link into your web browser:</p>
-                                                <a href="#" style="color: #6576ff;text-decoration: none;word-break: break-all;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">http://www.rentwise.com.ng/verifications/account-created-verified</a>
-                                            </td>
-                                        </tr>
+                                    
                                         <tr style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                             <td style="padding: 20px 30px 40px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;mso-table-lspace: 0pt !important;mso-table-rspace: 0pt !important;">
                                                 <p style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">If you did not make this request, please contact us or ignore this message.</p>
-                                                <p style="margin: 0;font-size: 13px;line-height: 22px;color: #9ea8bb;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;padding: 0;">This is an automatically generated email please do not reply to this email. If you face any issues, please contact us at  help@icocrypto.com</p>
+                                                <p style="margin: 0;font-size: 13px;line-height: 22px;color: #9ea8bb;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;padding: 0;">This is an automatically generated email please do not reply to this email. If you face any issues, please contact us at  help@vbox.com</p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -91,13 +126,13 @@ export const email = async (
                                     <tbody style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                         <tr style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                             <td style="text-align: center;padding: 25px 20px 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;mso-table-lspace: 0pt !important;mso-table-rspace: 0pt !important;">
-                                                <p style="font-size: 13px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Copyright © 2020 RentWise. All rights reserved.
+                                                <p style="font-size: 13px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">Copyright © 20201 VBOX. All rights reserved.
                                                     <br style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                                     Template Made By
-                                                    <a style="color: #6576ff;text-decoration: none;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;" href="https://www.rentwise.com.ng">RentWise</a>.</p>
+                                                    <a style="color: #6576ff;text-decoration: none;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;" href="https://www.vbox.com">VBOX</a>.</p>
                                                
                                                 <p style="padding-top: 15px;font-size: 12px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">This email was sent to you as a registered user of
-                                                    <a style="color: #6576ff;text-decoration: none;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;" href="https://www.rentwise.com.ng">www.rentwise.com.ng</a>. To update your emails preferences
+                                                    <a style="color: #6576ff;text-decoration: none;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;" href="https://www.vbox.com">www.vbox.com</a>. To update your emails preferences
                                                     <a style="color: #6576ff;text-decoration: none;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;" href="#">click here</a>.</p>
                                             </td>
                                         </tr>
@@ -110,7 +145,7 @@ export const email = async (
             </body>
         </head>
     </html>   
-`
+`,
   };
   // @ts-ignore
  sgMail.send(emailData).then((sent) => console.log('SENT 2 >>>')).catch((err) => console.log('ERR 2 >>>', err));

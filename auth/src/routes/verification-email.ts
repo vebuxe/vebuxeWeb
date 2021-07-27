@@ -4,19 +4,23 @@ import { BadRequestError, NotAuthorizedError } from '@vboxdev/common';
 import { User } from '../models/user';
 import { VerificationStatus } from '../services/verification-status';
 import { body } from 'express-validator';
+import { UserUpdatedPublisher } from '../events/publisher/user-updated-publisher ';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
 router.post(
-  '/api/users/email-verification/:userId',
+  '/api/users/verification/code',
   body('code').notEmpty().matches(/^\d+$/).withMessage('Invalid code number'),
+  body('telephone')
+    .notEmpty()
+    .matches(/^\d+$/)
+    .withMessage('Invalid telephone number'),
 
   async (req: Request, res: Response) => {
-    const { code } = req.body;
+    const { code, telephone } = req.body;
 
-    const userId = req.params.userId;
-
-    const user = await User.findById(req.params.userId);
+    const user = await User.findOne({ telephone });
 
     if (!user) {
       throw new NotAuthorizedError();
@@ -35,9 +39,26 @@ router.post(
     }
 
     user.verification = VerificationStatus.Verified;
+    user.verification_code = 0;
     await user.save();
 
-    res.send(user);
+    new UserUpdatedPublisher(natsWrapper.client).publish({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      userType: user.userType!,
+      telephone: parseInt(user.telephone),
+      expiresAt: user.expiresAt,
+      status: user.status!,
+      version: user.version,
+      verification: user.verification,
+    });
+
+    res.status(201).send({
+      successful: true,
+      code: 200,
+      message: 'Phone Verified',
+    });
 
     // store it on session object
   }
