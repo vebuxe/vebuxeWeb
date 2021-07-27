@@ -48,7 +48,7 @@ router.post(
       $or: [{ email }, { telephone }],
     });
     const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + 60 * 2);
+    expiration.setSeconds(expiration.getSeconds() + 60 * 2000);
 
     if (existingUser) {
       // console.log('Email in use');
