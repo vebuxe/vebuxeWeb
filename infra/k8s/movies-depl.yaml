@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: movies
-          image: us.gcr.io/v-box-318815/movies
+          image: dimeji45/movies
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
