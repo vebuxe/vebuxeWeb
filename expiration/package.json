@@ -20,7 +20,7 @@
   "dependencies": {
     "@rentwise/common": "^1.0.35",
     "@types/bull": "^3.14.0",
-    "@vboxdev/common": "^1.0.14",
+    "@vboxdev/common": "^1.0.22",
     "bull": "^3.18.0",
     "ts-node-dev": "^1.0.0-pre.56",
     "typescript": "^3.9.7"

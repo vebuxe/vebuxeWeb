@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
 
 import { BadRequestError, NotAuthorizedError } from '@vboxdev/common';
-import { User } from '../models/user';
+import { Code } from '../models/code';
 import { VerificationStatus } from '../services/verification-status';
 import { body } from 'express-validator';
-import { UserUpdatedPublisher } from '../events/publisher/user-updated-publisher ';
+import { CodeUpdatedPublisher } from '../events/publisher/code-updated-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
@@ -16,14 +16,21 @@ router.post(
     .notEmpty()
     .matches(/^\d+$/)
     .withMessage('Invalid telephone number'),
+  
 
   async (req: Request, res: Response) => {
     const { code, telephone } = req.body;
 
-    const user = await User.findOne({ telephone });
+    const user = await Code.findOne({
+      $and: [
+        { masked_phone: telephone },
+        { verification: VerificationStatus.Unverified },
+        { verification_code: code },
+      ],
+    });
 
     if (!user) {
-      throw new NotAuthorizedError();
+      throw new BadRequestError('Wrong Verification code.');
     }
 
     if (user.verification === VerificationStatus.Verified) {
@@ -39,18 +46,15 @@ router.post(
     }
 
     user.verification = VerificationStatus.Verified;
-    user.verification_code = 0;
     await user.save();
 
-    new UserUpdatedPublisher(natsWrapper.client).publish({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      userType: user.userType!,
-      telephone: parseInt(user.telephone),
+    new CodeUpdatedPublisher(natsWrapper.client).publish({
+      user: user.id,
       expiresAt: user.expiresAt,
-      status: user.status!,
+      masked_phone: user.masked_phone,
+      verification_code: user.verification_code,
       version: user.version,
+      codeType: user.codeType,
       verification: user.verification,
     });
 

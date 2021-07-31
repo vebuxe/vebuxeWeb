@@ -1,67 +1,94 @@
 // require on top
 import express, { Request, Response, NextFunction } from 'express';
 import { User } from '../../models/user';
-import { validateRequest, BadRequestError, VerificationStatus } from '@vboxdev/common';
+import {
+  validateRequest,
+  BadRequestError,
+  VerificationStatus,
+  CodeType,
+} from '@vboxdev/common';
 import { natsWrapper } from '../../nats-wrapper';
-import { UserUpdatedPublisher } from '../../events/publisher/user-updated-publisher ';
-
-
+import { CodeCreatedPublisher } from '../../events/publisher/code-created-publisher';
+import { Code } from '../../models/code';
+import { maskPhoneNumber } from 'mask-phone-number';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 
-
 const sgMail = require('@sendgrid/mail');
-  sgMail.setApiKey(process.env.SENDGRID);
+sgMail.setApiKey(process.env.SENDGRID);
 
 export const email = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-    const { telephone } = req.body;
+  const { telephone } = req.body;
+
+  const existingUser = await User.findOne({ telephone });
+
+  if (!existingUser) {
+    throw new BadRequestError('User with telephone number does not exist');
+  }
+
+  const verification_code = Math.floor(Math.random() * 899999 + 100000);
+
+  console.log(verification_code);
+
+  client.messages
+    .create({
+      body: `${verification_code} is your verification code for VBOX`,
+      from: '+15209993884',
+      to: '+' + telephone,
+    })
+    //@ts-ignore
+    .then((message) => console.log('Phone verification sent to phone'))
+    //@ts-ignore
+    .catch((error) =>
+      console.log(
+        'The number  is unverified. Trial accounts cannot send messages to unverified numbers'
+      )
+    );
+
+  const expiration = new Date();
+  expiration.setSeconds(expiration.getSeconds() + 60 * 3);
+
+  var phone = '+' + existingUser.telephone;
+
+  var maskedPhoneNumber = maskPhoneNumber(phone);
+
+  const user = await Code.findOne({
+    $and: [
+      { user: existingUser.id },
+      { verification: VerificationStatus.Unverified },
+    ],
+  });
     
-    const existingUser = await User.findOne({ telephone });
-    
-     if (!existingUser) {
-         throw new BadRequestError('User with telephone number does not exist');
-    }
+      if (user) {
+        throw new BadRequestError('User already have an unverified initated code');
+      }
 
+  const code = Code.build({
+    user: existingUser.id,
+    verification: VerificationStatus.Unverified,
+    verification_code: verification_code,
+    codeType: CodeType.Verification,
+    expiresAt: expiration,
+    masked_phone: maskedPhoneNumber,
+  });
 
-       const verification_code = Math.floor(Math.random() * 899999 + 100000);
+  new CodeCreatedPublisher(natsWrapper.client).publish({
+    expiresAt: code.expiresAt,
+    version: code.version,
+    verification: code.verification,
+    codeType: code.codeType,
+    verification_code: code.verification_code,
+    masked_phone: code.masked_phone,
+    user: code.user
+  });
 
-       console.log(verification_code);
-
-       client.messages
-         .create({
-           body: `${verification_code} is your verification code for VBOX`,
-           from: '+15209993884',
-           to: '+' + telephone,
-         })
-         //@ts-ignore
-         .then((message) => console.log(message))
-         //@ts-ignore
-         .catch((error) => console.log(error));
-
-       if (verification_code) {
-         existingUser.set({ verification_code });
-       }
-
-    await existingUser.save();
-    
-
-      new UserUpdatedPublisher(natsWrapper.client).publish({
-        id: existingUser.id,
-        email: existingUser.email,
-        username: existingUser.username,
-        userType: existingUser.userType!,
-        telephone: parseInt(existingUser.telephone),
-        expiresAt: existingUser.expiresAt,
-        status: existingUser.status!,
-        version: existingUser.version,
-        verification: existingUser.verification,
-      });
+  await code.save();
 
 
   const emailData = {
@@ -108,7 +135,7 @@ export const email = async (
                                                     <br style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
                                                     You are receiving this email because you have registered on our site.</p>
                                                      <p style="margin-bottom: 10px;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
-                                                     Verification Code : ${existingUser.verification_code}
+                                                     Verification Code : ${code.verification_code}
                                                      </p>
                                                
                                             </td>
@@ -148,7 +175,12 @@ export const email = async (
 `,
   };
   // @ts-ignore
- sgMail.send(emailData).then((sent) => console.log('SENT 2 >>>')).catch((err) => console.log('ERR 2 >>>', err));
+  sgMail
+    .send(emailData)
+    // @ts-ignore
+    .then((sent) => console.log('SENT 2 >>>'))
+    // @ts-ignore
+    .catch((err) => console.log('ERR 2 >>>', err));
 
   next();
 };

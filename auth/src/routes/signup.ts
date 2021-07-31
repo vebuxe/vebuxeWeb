@@ -69,9 +69,6 @@ router.post(
       username: fullname,
       telephone,
       userType,
-      verification: VerificationStatus.Unverified,
-      verification_code: 0,
-      expiresAt: expiration,
     });
 
     await user.save();
@@ -84,10 +81,8 @@ router.post(
       username: user.username,
       userType: user.userType!,
       telephone: parseInt(user.telephone),
-      expiresAt: user.expiresAt,
       status: user.status!,
       version: user.version,
-      verification: user.verification,
     });
 
     // Generate JWT
@@ -114,7 +109,6 @@ router.post(
       success: true,
       message: 'Registration was successful!',
       code: 201,
-      verification: user.verification,
       user,
     });
   }

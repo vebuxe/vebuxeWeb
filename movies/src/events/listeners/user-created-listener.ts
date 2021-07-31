@@ -12,13 +12,10 @@ export class UserCreatedListener extends Listener<UserCreatedEvent> {
     const {
       id,
       username,
-
       telephone,
       email,
       userType,
       status,
-      verification,
-      expiresAt,
     } = data;
     const user = User.build({
       id,
@@ -27,8 +24,6 @@ export class UserCreatedListener extends Listener<UserCreatedEvent> {
       email,
       userType,
       status,
-      verification,
-      expiresAt,
     });
     await user.save();
 

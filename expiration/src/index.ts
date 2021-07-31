@@ -1,5 +1,5 @@
 import { natsWrapper } from './nats-wrapper';
-import { UserCreatedListener } from './events/listeners/user-created-listener';
+import { CodeCreatedListener } from './events/listeners/code-created-listener';
 
 const start = async () => {
   console.log('Starting....................');
@@ -29,7 +29,8 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
-    new UserCreatedListener(natsWrapper.client).listen();
+    new CodeCreatedListener(natsWrapper.client).listen();
+    
   } catch (err) {
     console.error(err);
   }

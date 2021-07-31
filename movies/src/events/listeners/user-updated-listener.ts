@@ -30,8 +30,6 @@ export class UserUpdatedListener extends Listener<UserUpdatedEvent> {
       email,
       userType,
       status,
-      verification,
-      expiresAt,
     } = data;
 
     user.set({
@@ -41,8 +39,6 @@ export class UserUpdatedListener extends Listener<UserUpdatedEvent> {
       email,
       userType,
       status,
-      verification,
-      expiresAt,
     });
     await user.save();
 

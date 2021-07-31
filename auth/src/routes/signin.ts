@@ -1,11 +1,15 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import {User} from '../models/user';
+import { User } from '../models/user';
+import { Code } from '../models/code';
 import jwt from 'jsonwebtoken';
 
-import {Password} from '../services/password';
-import {validateRequest, BadRequestError,VerificationStatus} from '@vboxdev/common';
-
+import { Password } from '../services/password';
+import {
+  validateRequest,
+  BadRequestError,
+  VerificationStatus,
+} from '@vboxdev/common';
 
 const router = express.Router();
 
@@ -39,14 +43,24 @@ router.post(
       throw new BadRequestError('Invalid login details');
     }
 
-    if (existingUser.verification === VerificationStatus.Unverified) {
+    const userCode = await Code.findOne({ user: existingUser.id });
+
+    if (!userCode) {
+      throw new BadRequestError(
+        'This account has not initiated the verification process.'
+      );
+    }
+
+    if (userCode.verification === VerificationStatus.Unverified) {
       throw new BadRequestError(
         'Your account is unverified. Kindly check your mail to verify.'
       );
     }
 
-    if (existingUser.verification === VerificationStatus.Expire) {
-      throw new BadRequestError('Your account is verification has expired.');
+    if (userCode.verification === VerificationStatus.Expire) {
+      throw new BadRequestError(
+        'Your account verification has expired. kindli initaite another verification process'
+      );
     }
 
     // Generate JWT
@@ -58,7 +72,6 @@ router.post(
         username: existingUser.username,
         telephone: existingUser.telephone,
         userType: existingUser.userType,
-        verification: existingUser.verification,
         status: existingUser.status,
       },
       process.env.JWT_KEY!

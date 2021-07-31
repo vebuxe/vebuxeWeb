@@ -1,12 +1,11 @@
 import express, { Request, Response } from 'express';
 import { BadRequestError } from '@vboxdev/common';
 import { User } from '../models/user';
+import { Code } from '../models/code';
 import { body } from 'express-validator';
 import { email } from './email/email';
+
 import { maskPhoneNumber } from 'mask-phone-number';
-
-
-
 
 const router = express.Router();
 
@@ -27,9 +26,7 @@ router.get(
       throw new BadRequestError('User with telephone number does not exist');
     }
 
-    var phone = "+"+existingUser.telephone;
-
-   
+    var phone = '+' + existingUser.telephone;
 
     var maskedPhoneNumber = maskPhoneNumber(phone);
 

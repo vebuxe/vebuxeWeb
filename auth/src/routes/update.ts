@@ -66,10 +66,8 @@ router.put(
          username: user.username,
          userType: user.userType!,
          telephone: parseInt(user.telephone),
-         expiresAt: user.expiresAt,
          status: user.status!,
          version: user.version,
-         verification: user.verification,
        });
 
 

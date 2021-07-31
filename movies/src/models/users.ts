@@ -8,9 +8,7 @@ interface UserAttrs {
   username: string;
   userType: number;
   telephone: number;
-  verification: VerificationStatus;
   status: number;
-  expiresAt: Date;
 }
 
 export interface UserDoc extends mongoose.Document {
@@ -20,9 +18,7 @@ export interface UserDoc extends mongoose.Document {
   username: string;
   userType: number;
   telephone: number;
-  verification: VerificationStatus;
   status: number;
-  expiresAt: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -50,19 +46,12 @@ const UserSchema = new mongoose.Schema(
       default: 0,
     },
 
-    verification: {
-      type: String,
-      required: true,
-      enum: Object.values(VerificationStatus),
-      default: VerificationStatus.Unverified,
-    },
+
     status: {
       type: Number,
       default: 1,
     },
-    expiresAt: {
-      type: mongoose.Schema.Types.Date,
-    },
+
   },
   {
     toJSON: {
@@ -90,9 +79,7 @@ UserSchema.statics.build = (attrs: UserAttrs) => {
     telephone: attrs.telephone,
     email: attrs.email,
     userType: attrs.userType,
-    verification: attrs.verification,
     status: attrs.status,
-    expiresAt: attrs.expiresAt,
   });
 };
 

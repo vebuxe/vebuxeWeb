@@ -15,8 +15,9 @@ import { UserOnBoardingMessageRouter } from './routes/onboardingMessage';
 import { GetUserOnBoardingMessageRouter } from './routes/getOnboardingMessage';
 import { OnboardingUpdateRouter } from './routes/updateOnboardingMessage';
 import { RequestVerificationCodeRouter } from './routes/RequestVerificationCode';
-
-
+import { UserCodeRouter } from './routes/code';
+import { deleteUserRouter } from './routes/delete';
+import { ListUserRouter } from './routes/list';
 
 import cookieSession from 'cookie-session';
 const app = express();
@@ -42,6 +43,10 @@ app.use(UserOnBoardingMessageRouter);
 app.use(GetUserOnBoardingMessageRouter);
 app.use(OnboardingUpdateRouter);
 app.use(RequestVerificationCodeRouter);
+app.use(UserCodeRouter);
+app.use(deleteUserRouter);
+app.use(ListUserRouter);
+
 
 app.all('*', async (req, res, next) => {
   throw new NotFoundError();

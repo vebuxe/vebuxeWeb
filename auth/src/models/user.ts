@@ -11,30 +11,24 @@ interface UserAttrs {
   email: string;
   password: string;
   userType?: number;
-  verification: VerificationStatus;
-  verification_code: number;
-  expiresAt: Date;
   status?: number;
 }
 
 // An interface that describes the properties that a user model has
 
-interface UserModel extends mongoose.Model<UserDoc> {
+ interface UserModel extends mongoose.Model<UserDoc> {
   build(attrs: UserAttrs): UserDoc;
 }
 
 // An interface that describes the properties that a user document has
 
-interface UserDoc extends mongoose.Document {
+ interface UserDoc extends mongoose.Document {
   username: string;
   version: number;
   telephone: string;
   email: string;
   password: string;
   userType?: number;
-  verification: VerificationStatus;
-  verification_code: number;
-  expiresAt: Date;
   status?: number;
 }
 
@@ -66,19 +60,6 @@ const userSchema = new mongoose.Schema(
       default: 1,
     },
 
-    verification: {
-      type: String,
-      required: true,
-      enum: Object.values(VerificationStatus),
-      default: VerificationStatus.Unverified,
-    },
-    verification_code: {
-      type: Number,
-      default: 0,
-    },
-    expiresAt: {
-      type: mongoose.Schema.Types.Date,
-    },
   },
   {
     toJSON: {
