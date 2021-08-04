@@ -8,7 +8,7 @@ import { ExpirationVerificationListener } from './events/listeners/expiration-ve
 const start = async () => {
 
 
-  console.log('Starting............//./......')
+  console.log('Starting..................')
 
 
   if (!process.env.JWT_KEY) {
