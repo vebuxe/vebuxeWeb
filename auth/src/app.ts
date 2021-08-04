@@ -18,6 +18,10 @@ import { RequestVerificationCodeRouter } from './routes/RequestVerificationCode'
 import { UserCodeRouter } from './routes/code';
 import { deleteUserRouter } from './routes/delete';
 import { ListUserRouter } from './routes/list';
+import { UserIntRouter } from './routes/userInt';
+import { ListUserIntRouter } from './routes/listUserInt';
+import { UserIntGetByIdRouter } from './routes/userIntGetById';
+
 
 import cookieSession from 'cookie-session';
 const app = express();
@@ -46,7 +50,9 @@ app.use(RequestVerificationCodeRouter);
 app.use(UserCodeRouter);
 app.use(deleteUserRouter);
 app.use(ListUserRouter);
-
+app.use(UserIntRouter);
+app.use(ListUserIntRouter);
+app.use(UserIntGetByIdRouter);
 
 app.all('*', async (req, res, next) => {
   throw new NotFoundError();
