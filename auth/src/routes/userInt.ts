@@ -20,12 +20,6 @@ router.post(
 
   [
     body('email').isEmail().withMessage('Email must be valid'),
-    body('fullname').not().isEmpty().withMessage('Fullname is required'),
-    body('userType').not().isEmpty().withMessage('User Type is required'),
-    body('telephone')
-      .notEmpty()
-      .matches(/^\d+$/)
-      .withMessage('Invalid telephone number'),
   ],
   validateRequest,
 

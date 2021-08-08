@@ -41,7 +41,7 @@ const UserIntSchema = new mongoose.Schema(
 
     userType: {
       type: String,
-      required: true,
+  
       enum: Object.values(UserType),
     },
   },
