@@ -30,7 +30,6 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
     },
     telephone: {
       type: String,
@@ -38,7 +37,6 @@ const UserSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
     },
 
     userType: {

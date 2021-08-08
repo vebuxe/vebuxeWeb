@@ -29,12 +29,10 @@ const UserIntSchema = new mongoose.Schema(
   {
     fullname: {
       type: String,
-      required: true,
     },
 
     telephone: {
       type: String,
-      required: true,
     },
     email: {
       type: String,

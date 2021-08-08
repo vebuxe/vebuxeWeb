@@ -11,8 +11,6 @@ import { User } from '../models/user';
 import { natsWrapper } from '../nats-wrapper';
 import { UserCreatedPublisher } from '../events/publisher/user-created-publisher';
 
-
-
 const router = express.Router();
 
 router.post(
@@ -31,7 +29,6 @@ router.post(
       .withMessage('Password must be between 4 and 20 chracters')
       .matches(/\d/)
       .withMessage('Password must contain a number'),
-    body('fullname').not().isEmpty().withMessage('Fullname is required'),
     body('telephone')
       .notEmpty()
       .matches(/^\d+$/)
@@ -39,16 +36,19 @@ router.post(
   ],
   validateRequest,
 
-
   async (req: Request, res: Response) => {
     const { email, password, fullname, telephone, userType, rpassword } =
       req.body;
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { telephone }],
-    });
-    const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + 60 * 2000);
+    let existingUser;
+
+    if (email) {
+      existingUser = await User.findOne({
+        $or: [{ email }, { telephone }],
+      });
+    } else {
+      existingUser = await User.findOne({ telephone });
+    }
 
     if (existingUser) {
       // console.log('Email in use');
@@ -57,11 +57,8 @@ router.post(
     }
 
     if (rpassword !== password) {
-          throw new BadRequestError('Password do not match');
-       }
-
- 
- 
+      throw new BadRequestError('Password do not match');
+    }
 
     const user = User.build({
       email,
