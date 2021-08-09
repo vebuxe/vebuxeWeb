@@ -11,7 +11,7 @@ build:
   # googleCloudBuild:
   #   projectId: v-box-318815
   artifacts:
-    - image: dimeji45/auth
+    - image: vbox45/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -19,7 +19,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: dimeji45/expiration
+    - image: vbox45/expiration
       context: expiration
       docker:
         dockerfile: Dockerfile
@@ -27,7 +27,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: dimeji45/movies
+    - image: vbox45/movies
       context: movies
       docker:
         dockerfile: Dockerfile
@@ -35,7 +35,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: dimeji45/client
+    - image: vbox45/client
       context: client
       docker:
         dockerfile: Dockerfile

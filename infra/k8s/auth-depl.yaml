@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: dimeji45/auth
+          image: vbox45/auth
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
@@ -59,4 +59,3 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
-      

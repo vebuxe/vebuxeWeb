@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: dimeji45/client
+          image: vbox45/client
 
 ---
 apiVersion: v1
@@ -29,4 +29,3 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
-      
