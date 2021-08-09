@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'expiration/**'
-
 jobs:
   build:
     runs-on: ubuntu-latest

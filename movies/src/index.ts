@@ -8,7 +8,6 @@ import { UserUpdatedListener } from './events/listeners/user-updated-listener';
 
 const start = async () => {
 
-
   console.log('Starting...................')
 
 
