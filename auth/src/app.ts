@@ -25,6 +25,7 @@ import { UserIntGetByIdRouter } from './routes/userIntGetById';
 var cors = require('cors');
 
 
+
 import cookieSession from 'cookie-session';
 const app = express();
 app.set('trust proxy', true);
