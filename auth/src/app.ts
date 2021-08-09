@@ -22,11 +22,14 @@ import { UserIntRouter } from './routes/userInt';
 import { ListUserIntRouter } from './routes/listUserInt';
 import { UserIntGetByIdRouter } from './routes/userIntGetById';
 
+var cors = require('cors');
+
 
 import cookieSession from 'cookie-session';
 const app = express();
 app.set('trust proxy', true);
 app.use(json());
+app.use(cors());
 app.use(
   cookieSession({
     signed: false,
