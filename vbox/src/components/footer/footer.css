@@ -1,0 +1,24 @@
+.footer{
+    height: 80px;
+    padding: 0px 100px;
+    position:absolute;
+    left:0;
+    bottom:0;
+    right:0;
+}
+
+@media (max-width: 768px){
+    .footer{
+        flex-direction: column;
+        padding: 20px;
+        height: auto;
+        bottom: unset;
+  
+    }
+
+    .right-footer-text{
+        flex-direction: column;
+        line-height: 1.5;
+        row-gap: 10px;
+    }
+}

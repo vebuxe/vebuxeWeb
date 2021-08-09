@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client-depl
+  name: vbox-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: client
+      app: vbox
   template:
     metadata:
       labels:
-        app: client
+        app: vbox
     spec:
       containers:
-        - name: client
-          image: vbox45/client
+        - name: vbox
+          image: vbox45/vbox
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: client-srv
+  name: vbox-srv
 spec:
   selector:
-    app: client
+    app: vbox
   ports:
-    - name: client
+    - name: vbox
       protocol: TCP
       port: 3000
       targetPort: 3000

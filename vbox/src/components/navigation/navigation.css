@@ -1,0 +1,149 @@
+.navigation-wrapper{
+    z-index: 10;
+    background: #052442;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 100px 0px 150px;
+    height: 80px;
+    width: auto;
+}
+
+.navigation{
+    z-index: 999;
+}
+
+.nav-links{
+    display: flex;
+    align-items: center;
+    column-gap: 25px;
+}
+
+.nav-links a{
+    color: #29AAE2;
+    text-decoration: none;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.border-link{
+    border: 1px solid #29AAE2;
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+.line-spacer{
+    border: 1px solid #7E7E7E;
+}
+
+.nav-open  {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+    .nav-open > .main-portion {
+        animation: slidein 0.5s ease forwards;
+    }
+        .nav-open > .main-portion > div {
+            animation: appear 0.5s ease forwards;
+        }
+
+.nav-close {
+    animation: fadeOut 0.5s ease forwards;
+}
+    .nav-close > .main-portion {
+        animation: slideout 0.5s ease forwards;
+    }
+
+    .nav-close > .main-portion > div {
+       display: none;
+    }
+
+
+    .whole-area{
+        z-index: 999;
+    }
+
+
+@keyframes slidein {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 80%;
+    }
+}
+
+@keyframes slideout {
+    from {
+        width: 80%;
+        display: block;
+    }
+
+    to {
+        width: 0;
+        display: none;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        width: 100%;
+        background-color: rgba(255,255,255,0);
+    }
+
+    to {
+        width: 100%;
+        background-color: rgba(255,255,255,0.85);
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+
+    75%{
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        width: 100%;
+        display: block;
+    }
+
+    to {
+        width: 0;
+        display: none;
+    }
+}
+
+
+
+@media (max-width: 768px){
+    .navigation-wrapper{
+        display: none;
+    }
+    .nav-links{
+        display: flex;
+        flex-direction: column;
+        row-gap: 40px;
+        padding: 70px 0px;
+    }
+    .navigation{
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .whole-area, .main-portion {
+        top: 0;
+        left: 0;
+        height: 100%;
+    }
+}

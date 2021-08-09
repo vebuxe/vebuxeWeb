@@ -1,0 +1,31 @@
+.popup {
+    z-index: 999;
+    background-color: rgba(47, 26, 67, 0.5);
+    padding: 110px 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.popup .popup-content {
+    background-color: white;
+    border-radius: 3px;
+    max-height: 80vh;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+
+@media (max-width: 760px){
+    .popup-content{
+        width: 98% !important;
+        padding: 15px 10px !important;
+    }
+    .popup .popup-content {
+        max-height: 98vh;
+    }
+    .popup {
+        padding: 5px 0px;
+    }
+}

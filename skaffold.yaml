@@ -35,8 +35,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: vbox45/client
-      context: client
+    - image: vbox45/vbox
+      context: vbox
       docker:
         dockerfile: Dockerfile
       sync:

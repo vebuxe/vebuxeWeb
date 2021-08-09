@@ -23,7 +23,7 @@ spec:
               servicePort: 3000
           - path: /?(.*)
             backend:
-              serviceName: client-srv
+              serviceName: vbox-srv
               servicePort: 3000
           - path: /api/movies/?(.*)
             backend:
