@@ -52,7 +52,7 @@ export const email = async (
     );
 
   const expiration = new Date();
-  expiration.setSeconds(expiration.getSeconds() + 60 * 5);
+  expiration.setSeconds(expiration.getSeconds() + 60 * 2);
 
   var phone = '+' + existingUser.telephone;
 
@@ -69,6 +69,7 @@ export const email = async (
     // throw new BadRequestError('User already have an unverified initated code');
     user.set({ verification: VerificationStatus.Expire });
     user.save();
+    return;
   }
 
   const code = Code.build({
