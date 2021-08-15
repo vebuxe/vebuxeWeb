@@ -52,7 +52,7 @@ export const email = async (
     );
 
   const expiration = new Date();
-  expiration.setSeconds(expiration.getSeconds() + 60 * 30);
+  expiration.setSeconds(expiration.getSeconds() + 60 * 2);
 
   var phone = '+' + existingUser.telephone;
 
