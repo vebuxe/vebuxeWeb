@@ -68,6 +68,7 @@ export const email = async (
   if (user) {
     // throw new BadRequestError('User already have an unverified initated code');
     user.set({ verification: VerificationStatus.Expire });
+    await user.save();
   }
 
   const code = Code.build({
