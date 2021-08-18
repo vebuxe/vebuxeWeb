@@ -46,6 +46,8 @@ if (!process.env.NATS_CLUSTER_ID) {
 
       new ExpirationVerificationListener(natsWrapper.client).listen();
      
+
+     
      
 
      
