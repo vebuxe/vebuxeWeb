@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: producer
-          image:vbox45/producer
+          image: vbox45/producer
 
 ---
 apiVersion: v1

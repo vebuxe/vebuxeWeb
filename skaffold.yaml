@@ -11,7 +11,7 @@ build:
   # googleCloudBuild:
   #   projectId: v-box-318815
   artifacts:
-    - image:vbox45/auth
+    - image: vbox45/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -19,7 +19,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image:vbox45/expiration
+    - image: vbox45/expiration
       context: expiration
       docker:
         dockerfile: Dockerfile
@@ -27,7 +27,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image:vbox45/movies
+    - image: vbox45/movies
       context: movies
       docker:
         dockerfile: Dockerfile
@@ -35,7 +35,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image:vbox45/vbox
+    - image: vbox45/vbox
       context: vbox
       docker:
         dockerfile: Dockerfile
@@ -43,7 +43,7 @@ build:
         manual:
           - src: 'src/**/*.js'
             dest: .
-    - image:vbox45/producer
+    - image: vbox45/producer
       context: producer
       docker:
         dockerfile: Dockerfile

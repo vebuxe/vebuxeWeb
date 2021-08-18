@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: vbox
-          image:vbox45/vbox
+          image: vbox45/vbox
 
 ---
 apiVersion: v1
