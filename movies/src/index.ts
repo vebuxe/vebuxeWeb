@@ -8,7 +8,7 @@ import { UserUpdatedListener } from './events/listeners/user-updated-listener';
 
 const start = async () => {
 
-  console.log('Starting......................')
+  console.log('Starting.......................')
 
 
   if (!process.env.JWT_KEY) {
