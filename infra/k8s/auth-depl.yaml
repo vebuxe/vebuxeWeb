@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: vbox45/auth
+          image:vbox45/auth
           env:
             - name: NATS_CLIENT_ID
               valueFrom:

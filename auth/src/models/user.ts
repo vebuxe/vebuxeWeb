@@ -14,6 +14,8 @@ interface UserAttrs {
   status?: number;
 }
 
+
+
 // An interface that describes the properties that a user model has
 
  interface UserModel extends mongoose.Model<UserDoc> {
