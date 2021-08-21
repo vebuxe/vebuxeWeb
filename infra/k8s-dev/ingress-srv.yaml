@@ -33,6 +33,7 @@ spec:
             backend:
               serviceName: producer-srv
               servicePort: 3000
+              
          
               
                 
