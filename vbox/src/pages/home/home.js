@@ -15,7 +15,7 @@ export const features = [
     {
         image: one,
         title: 'Pay no more for data',
-        content: 'Stream your favourite Nollywood movies and others without paying extra for data and stream at high definition.',
+        content: 'Stream and watch your favourite movies even without having data on your phone, and at high definition.',
     },
     {
         image: two,
@@ -24,8 +24,8 @@ export const features = [
     },
     {
         image: three,
-        title: 'Get a free wallet',
-        content: 'Fund your wallet, make basic transfer from your wallet to your friends and family on your VBOX contacts.',
+        title: 'Create a free Account',
+        content: 'Create a free account, fund your wallet, make basic transfer from your account to your friends and family on your VBOX contacts.',
     },
 ]
 
@@ -34,12 +34,12 @@ export default function Home() {
 
     const history = useHistory()
 
-    const text = <>Worry no more about data cost to stream your favourite movies on VBOX</>
+    const text = <>Watch your favorite movies on VBOX without worrying about data</>
     return (
         <div className="p-relative full-vh overflow-y-scroll full-width home-wrapper" >
             <div className="body-header-padding d-flex flex-vertical align-center">
                 <LogoTopSection text={text} />
-                <Spacer height={50} />
+                <Spacer height={10} />
                 <div className="d-flex d-wp">
                     <Details/>
                 </div>
