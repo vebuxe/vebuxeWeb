@@ -16,29 +16,29 @@ export class ExpirationVerificationListener extends Listener<ExirationVerificati
   queueGroupName = queueGroupName;
 
   async onMessage(data: ExirationVerificationEvent['data'], msg: Message) {
-    const code = await Code.findOne({user: data.userId});
+    const code = await Code.findOne({ user: data.userId });
 
-    if (!code) {
-      throw new Error('User not found');
-    }
+    if (code) {
+      if (code.verification === VerificationStatus.Unverified) {
+        code.set({
+          verification: VerificationStatus.Expire,
+        });
+      }
 
-    if (code.verification === VerificationStatus.Unverified) {
-      code.set({
-        verification: VerificationStatus.Expire,
+      await code.save();
+
+      new CodeUpdatedPublisher(natsWrapper.client).publish({
+        user: code.id,
+        expiresAt: code.expiresAt,
+        version: code.version,
+        verification: code.verification,
+        verification_code: code.verification_code,
+        codeType: code.codeType,
+        masked_phone: code.masked_phone,
       });
+    } else {
+      console.log('User Not Founs');
     }
-
-    await code.save();
-
-     new CodeUpdatedPublisher(natsWrapper.client).publish({
-       user: code.id,
-       expiresAt: code.expiresAt,
-       version: code.version,
-       verification: code.verification,
-       verification_code: code.verification_code,
-       codeType: code.codeType,
-       masked_phone: code.masked_phone,
-     });
 
     msg.ack();
   }

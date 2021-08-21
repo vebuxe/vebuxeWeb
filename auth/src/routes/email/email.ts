@@ -52,7 +52,7 @@ export const email = async (
     );
 
   const expiration = new Date();
-  expiration.setSeconds(expiration.getSeconds() + 60 * 30);
+  expiration.setSeconds(expiration.getSeconds() + 60 * 2);
 
   var phone = '+' + existingUser.telephone;
 
@@ -66,8 +66,12 @@ export const email = async (
   });
 
   if (user) {
-    throw new BadRequestError('User already have an unverified initated code');
+    // throw new BadRequestError('User already have an unverified initated code');
+    user.set({ verification: VerificationStatus.Expire });
+     await user.save();
   }
+
+ 
 
   const code = Code.build({
     user: existingUser.id,
@@ -98,12 +102,11 @@ export const email = async (
     emailSet = existingUser.email;
   }
 
- 
-    const emailData = {
-      from: 'afasina@nasdng.com',
-      to: `${emailSet}`,
-      subject: `Dear ${existingUser.username}`,
-      html: `
+  const emailData = {
+    from: 'afasina@nasdng.com',
+    to: `${emailSet}`,
+    subject: `Dear ${existingUser.username}`,
+    html: `
     <!DOCTYPE html>
     <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0 auto !important;padding: 0 !important;font-size: 14px;margin-bottom: 10px;line-height: 24px;color: #8094ae;font-weight: 400;height: 100% !important;width: 100% !important;font-family: 'Roboto', sans-serif !important;">
         <head style="-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;margin: 0;padding: 0;">
@@ -181,14 +184,14 @@ export const email = async (
         </head>
     </html>   
 `,
-    };
+  };
+  // @ts-ignore
+  sgMail
+    .send(emailData)
     // @ts-ignore
-    sgMail
-      .send(emailData)
-      // @ts-ignore
-      .then((sent) => console.log('SENT 2 >>>'))
-      // @ts-ignore
-      .catch((err) => console.log('ERR 2 >>>', err));
-  
+    .then((sent) => console.log('SENT 2 >>>'))
+    // @ts-ignore
+    .catch((err) => console.log('ERR 2 >>>', err));
+
   next();
 };

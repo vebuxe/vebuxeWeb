@@ -9,7 +9,7 @@ import { maskPhoneNumber } from 'mask-phone-number';
 
 const router = express.Router();
 
-router.get(
+router.post(
   '/api/users/request/verification',
   body('telephone')
     .notEmpty()
