@@ -32,8 +32,7 @@ export const email = async (
     throw new BadRequestError('User with telephone number does not exist');
   }
 
-  const verification_code = Math.floor(Math.random() * 899999 + 100000);
-
+  const verification_code = 123456
   console.log(verification_code);
 
   client.messages

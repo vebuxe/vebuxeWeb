@@ -21,7 +21,7 @@ import { ListUserRouter } from './routes/list';
 import { UserIntRouter } from './routes/userInt';
 import { ListUserIntRouter } from './routes/listUserInt';
 import { UserIntGetByIdRouter } from './routes/userIntGetById';
-
+import { userAuthRouter } from './routes/userAuth';
 var cors = require('cors');
 
 
@@ -57,6 +57,7 @@ app.use(ListUserRouter);
 app.use(UserIntRouter);
 app.use(ListUserIntRouter);
 app.use(UserIntGetByIdRouter);
+app.use(userAuthRouter);
 
 app.all('*', async (req, res, next) => {
   throw new NotFoundError();
