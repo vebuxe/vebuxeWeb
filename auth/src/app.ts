@@ -25,7 +25,6 @@ import { userAuthRouter } from './routes/userAuth';
 var cors = require('cors');
 
 
-
 import cookieSession from 'cookie-session';
 const app = express();
 app.set('trust proxy', true);
