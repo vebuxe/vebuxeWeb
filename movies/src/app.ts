@@ -11,7 +11,6 @@ import { CategoryDeleteRouter } from './routes/category_remove';
 import { CategoryUpdateRouter } from './routes/category_update';
 var fileupload = require('express-fileupload');
 
-
 import cookieSession from 'cookie-session';
 const app = express();
 app.set('trust proxy', true);

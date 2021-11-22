@@ -22,4 +22,3 @@ jobs:
       - run: doctl kubernetes cluster kubeconfig save vbox
       - run: kubectl rollout restart deployment auth-depl
       
-      
