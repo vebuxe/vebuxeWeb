@@ -34,6 +34,7 @@ spec:
               serviceName: producer-srv
               servicePort: 3000
               
+              
          
               
                 
