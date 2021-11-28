@@ -28,7 +28,8 @@ var cors = require('cors');
 
 import cookieSession from 'cookie-session';
 const app = express();
-app.use(cors({origin: '*'}));
+// app.use(cors({origin: '*'}));
+app.options('*', cors())
 app.set('trust proxy', true);
 app.use(json());
 
