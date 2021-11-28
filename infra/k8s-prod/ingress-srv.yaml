@@ -29,10 +29,6 @@ spec:
             backend:
               serviceName: movies-srv
               servicePort: 3000
-          - path: /producer/?(.*)
-            backend:
-              serviceName: producer-srv
-              servicePort: 3000
 ---
 apiVersion: v1
 kind: Service

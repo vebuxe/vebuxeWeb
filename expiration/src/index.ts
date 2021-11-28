@@ -8,6 +8,7 @@ const start = async () => {
   }
 
   
+  
   if (!process.env.NATS_URL) {
     throw new Error('NATS_URL must be defined');
   }
