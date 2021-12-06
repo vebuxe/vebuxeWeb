@@ -31,7 +31,6 @@ export const email = async (
   if (!existingUser) {
     throw new BadRequestError('User with telephone number does not exist');
   }
-
   const verification_code = 123456
   console.log(verification_code);
 
