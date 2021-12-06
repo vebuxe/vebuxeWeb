@@ -28,7 +28,6 @@ if (!process.env.NATS_URL) {
 if (!process.env.NATS_CLUSTER_ID) {
   throw new Error('NATS_CLUSTER_ID must be defined');
   }
-  
 
    try {
     await natsWrapper.connect(
