@@ -16,8 +16,6 @@ spec:
         - name: vbox
           image: vbox45/vbox
           
-          
-
 ---
 apiVersion: v1
 kind: Service

@@ -5,7 +5,6 @@ import Home from "./pages/home/home";
 import Waitlist from "./pages/waitlist/waitlist";
 
 
-
 function App() {
   return (
     <Switch>
